@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>99 Yacht — Charter Booking Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="topbar">
+  <div class="topbar__mark">
+    <span class="topbar__anchor">⚓</span>
+    <span class="topbar__word">99<em>Yacht</em></span>
+  </div>
+
+  <nav id="topbar-nav" class="topbar__nav">
+    <a href="#book">Book</a>
+    <a href="#board">Tide Board</a>
+    <a href="#ledger">Ledger</a>
+    <button id="open-login" class="btn btn--outline topbar__login">Log in</button>
+    <button id="logout-btn" class="btn btn--outline topbar__login" hidden>Log out</button>
+  </nav>
+
+  <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="topbar-nav">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- LOGIN / SIGN UP MODAL -->
+<div id="login-overlay" class="modal-overlay" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <button id="close-login" class="day-detail__close" aria-label="Close login form">×</button>
+    <span class="section__tag">Captain's access</span>
+    <h3 id="login-title">Log in to the harbor office</h3>
+    <p id="login-sub" class="modal-sub">Anyone can browse the tide board and ledger. Log in to add, edit, or remove a booking.</p>
+
+    <button type="button" id="google-login-btn" class="btn btn--google">
+      <svg viewBox="0 0 18 18" class="google-icon" aria-hidden="true">
+        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.9v2.33A9 9 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.66 9c0-.59.1-1.17.29-1.7V4.97H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.03z"/>
+        <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .9 4.97l3.05 2.33C4.66 5.17 6.65 3.58 9 3.58z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <form id="login-form" autocomplete="off">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required minlength="6">
+      </div>
+      <p id="login-error" class="form-error"></p>
+      <button type="submit" id="auth-submit-btn" class="btn btn--brass modal-submit">Log in</button>
+    </form>
+
+    <p class="modal-switch">
+      <span id="auth-switch-text">New to 99Yacht?</span>
+      <button type="button" id="auth-switch-btn" class="link-btn">Create an account</button>
+    </p>
+  </div>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__text">
+      <p class="hero__eyebrow">Est. dock at slip 99</p>
+      <h1 class="hero__title">Every voyage<br> starts with a <span>line in the log.</span></h1>
+      <p class="hero__sub">Reserve your date, record the advance, and watch it take its place on the tide board — the harbor's shared view of what's already spoken for.</p>
+      <a href="#book" class="btn btn--brass">Log a booking ↓</a>
+    </div>
+    <div class="hero__glass" aria-hidden="true">
+      <svg viewBox="0 0 400 300" class="hero__yacht">
+        <defs>
+          <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E4C878"/>
+            <stop offset="100%" stop-color="#B98D5E"/>
+          </linearGradient>
+        </defs>
+        <path d="M40 190 Q200 240 360 190 L330 220 Q200 260 70 220 Z" fill="url(#hull)"/>
+        <rect x="150" y="70" width="6" height="120" fill="#DCEEE9"/>
+        <path d="M156 78 L156 160 L235 160 Z" fill="#123C41" stroke="#DCEEE9" stroke-width="2"/>
+        <path d="M150 90 L150 155 L95 155 Z" fill="#DCEEE9" opacity="0.85"/>
+        <line x1="20" y1="222" x2="380" y2="222" stroke="#DCEEE9" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="2 10"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- BOOKING FORM -->
+  <section id="book" class="section">
+    <div class="section__head">
+      <span class="section__tag">01 — New entry</span>
+      <h2>Write the client into the log</h2>
+      <p>Every booking records the charter date, what's been paid down, and what's still owed at the dock.</p>
+    </div>
+
+    <form id="booking-form" class="log-card" autocomplete="off">
+      <div class="log-card__row">
+        <div class="field">
+          <label for="client-name">Client name</label>
+          <input type="text" id="client-name" placeholder="e.g. Amara Kessi" required>
+        </div>
+        <div class="field">
+          <label for="yacht-name">Yacht</label>
+          <select id="yacht-name" required>
+            <option value="" disabled selected>Choose a vessel</option>
+            <option>The Meridian</option>
+            <option>Coral Drift</option>
+            <option>Salt & Sable</option>
+            <option>Windward Nine</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="log-card__row">
+        <div class="field">
+          <label for="booking-date">Charter date</label>
+          <input type="date" id="booking-date" required>
+        </div>
+        <div class="field">
+          <label for="total-amount">Total amount ($)</label>
+          <input type="number" id="total-amount" min="0" step="0.01" placeholder="0.00" required>
+        </div>
+        <div class="field">
+          <label for="advance-paid">Advance paid ($)</label>
+          <input type="number" id="advance-paid" min="0" step="0.01" placeholder="0.00" required>
+        </div>
+      </div>
+
+      <div class="log-card__foot">
+        <p id="form-error" class="form-error"></p>
+        <button type="submit" class="btn btn--brass" id="submit-booking">Add to the log</button>
+      </div>
+      <p id="staff-hint" class="staff-hint">Log in as staff (top right) to add a booking.</p>
+    </form>
+  </section>
+
+  <!-- TIDE BOARD CALENDAR -->
+  <section id="board" class="section section--dark">
+    <div class="section__head">
+      <span class="section__tag section__tag--light">02 — Tide board</span>
+      <h2>See what's already claimed</h2>
+      <p>Every pennant marks a date that's spoken for. An empty square is still open water.</p>
+    </div>
+
+    <div class="board">
+      <div class="board__nav">
+        <button id="prev-month" class="board__arrow" aria-label="Previous month">‹</button>
+        <h3 id="month-label"></h3>
+        <button id="next-month" class="board__arrow" aria-label="Next month">›</button>
+      </div>
+      <div class="board__weekdays">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div id="calendar-grid" class="board__grid"></div>
+    </div>
+
+    <div id="day-detail" class="day-detail" hidden>
+      <button id="close-detail" class="day-detail__close" aria-label="Close">×</button>
+      <h4 id="day-detail-title"></h4>
+      <ul id="day-detail-list"></ul>
+    </div>
+  </section>
+
+  <!-- LEDGER -->
+  <section id="ledger" class="section">
+    <div class="section__head">
+      <span class="section__tag">03 — Ledger</span>
+      <h2>The full record</h2>
+      <p>Every booking, what's been paid, and what's still owed at the dock.</p>
+    </div>
+
+    <div class="ledger-wrap">
+      <table class="ledger">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Yacht</th>
+            <th>Charter date</th>
+            <th>Total</th>
+            <th>Advance paid</th>
+            <th>Balance due</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ledger-body">
+          <!-- rows injected by script.js -->
+        </tbody>
+      </table>
+      <p id="ledger-empty" class="ledger-empty">No entries yet — the log is waiting for its first booking.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <span>99Yacht — a logbook, not a broker.</span>
+  <span>Data stays on this device.</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabaseClient.js"></script>
+<script src="auth.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
