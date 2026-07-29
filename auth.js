@@ -1,7 +1,7 @@
 // ============================================================
 // AUTH — handles the login/sign-up modal, logging in/out, and
 // keeping the nav buttons in sync with the session. Relies on the
-// `supabase` client from supabaseClient.js, loaded before this file.
+// `window.sb` client from supabaseClient.js, loaded before this file.
 //
 // Exposes globally (used by script.js):
 //   - currentUser   the logged-in staff member, or null as a guest
@@ -29,10 +29,18 @@ const authSwitchText = document.getElementById("auth-switch-text");
 const authSwitchBtn = document.getElementById("auth-switch-btn");
 const googleLoginBtn = document.getElementById("google-login-btn");
 
+const profileMenu = document.getElementById("profile-menu");
+const profileTrigger = document.getElementById("profile-trigger");
+const profileDropdown = document.getElementById("profile-dropdown");
+const profileAvatar = document.getElementById("profile-avatar");
+const profileAvatarLg = document.getElementById("profile-avatar-lg");
+const profileEmail = document.getElementById("profile-email");
+const profileSince = document.getElementById("profile-since");
+
 // ============ SESSION HANDLING ============
 async function initAuth() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await window.sb.auth.getSession();
     currentUser = session?.user ?? null;
   } catch (err) {
     console.error("Could not check for a logged-in session:", err.message);
@@ -41,7 +49,7 @@ async function initAuth() {
   updateAuthUI();
 
   try {
-    supabase.auth.onAuthStateChange((_event, session) => {
+    window.sb.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user ?? null;
       updateAuthUI();
       // renderLedger lives in script.js — it only shows "Remove" buttons
@@ -54,9 +62,62 @@ async function initAuth() {
 }
 
 function updateAuthUI() {
-  openLoginBtn.hidden = !!currentUser;
-  logoutBtn.hidden = !currentUser;
+  const loggedIn = !!currentUser;
+  openLoginBtn.hidden = loggedIn;
+  profileMenu.hidden = !loggedIn;
+
+  if (loggedIn) {
+    const email = currentUser.email || "Signed in";
+    const initials = getInitials(email);
+    profileAvatar.textContent = initials;
+    profileAvatarLg.textContent = initials;
+    profileEmail.textContent = email;
+    profileSince.textContent = currentUser.created_at
+      ? `Aboard since ${formatJoinDate(currentUser.created_at)}`
+      : "Welcome aboard";
+  } else {
+    closeProfileDropdown();
+  }
 }
+
+function getInitials(email) {
+  const namePart = (email.split("@")[0] || "").replace(/[^a-zA-Z]+/g, " ").trim();
+  const parts = namePart.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  if (namePart.length >= 2) return namePart.slice(0, 2).toUpperCase();
+  return "⚓";
+}
+
+function formatJoinDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+// ============ PROFILE DROPDOWN ============
+function openProfileDropdown() {
+  profileDropdown.hidden = false;
+  profileTrigger.setAttribute("aria-expanded", "true");
+}
+
+function closeProfileDropdown() {
+  profileDropdown.hidden = true;
+  profileTrigger.setAttribute("aria-expanded", "false");
+}
+
+profileTrigger.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (profileDropdown.hidden) openProfileDropdown();
+  else closeProfileDropdown();
+});
+
+document.addEventListener("click", (e) => {
+  if (!profileDropdown.hidden && !profileMenu.contains(e.target)) closeProfileDropdown();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !profileDropdown.hidden) closeProfileDropdown();
+});
 
 // ============ MODAL OPEN / CLOSE ============
 function openLogin() {
@@ -96,7 +157,7 @@ openLoginBtn.addEventListener("click", openLogin);
 logoutBtn.addEventListener("click", async () => {
   logoutBtn.disabled = true;
   try {
-    await supabase.auth.signOut();
+    await window.sb.auth.signOut();
   } catch (err) {
     console.error("Sign out failed:", err.message);
   } finally {
@@ -115,7 +176,7 @@ googleLoginBtn.addEventListener("click", async () => {
   loginError.textContent = "";
 
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await window.sb.auth.signInWithOAuth({
       provider: "google",
       options: {
         // sends the person right back to this same page after Google login
@@ -161,7 +222,7 @@ loginForm.addEventListener("submit", async (e) => {
   authSubmitBtn.textContent = authMode === "signup" ? "Signing up…" : "Logging in…";
 
   if (authMode === "signup") {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await window.sb.auth.signUp({ email, password });
 
     authSubmitBtn.disabled = false;
     authSubmitBtn.textContent = "Sign up";
@@ -181,7 +242,7 @@ loginForm.addEventListener("submit", async (e) => {
       loginError.textContent = "Account created — check your email to confirm it, then log in.";
     }
   } else {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await window.sb.auth.signInWithPassword({ email, password });
 
     authSubmitBtn.disabled = false;
     authSubmitBtn.textContent = "Log in";

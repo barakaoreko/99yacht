@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>99 Yacht — Charter Booking Log</title>
+<title>yachtchartertz Booking Log</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,18 +14,34 @@
 
 <div class="grain"></div>
 
+
 <header class="topbar">
   <div class="topbar__mark">
-    <span class="topbar__anchor">⚓</span>
-    <span class="topbar__word">99<em>Yacht</em></span>
+    <span class="topbar__word"><em>yachtchartertz</em></span>
   </div>
 
   <nav id="topbar-nav" class="topbar__nav">
     <a href="#book">Book</a>
-    <a href="#board">Tide Board</a>
+    <a href="#board">Calendar</a>
     <a href="#ledger">Ledger</a>
     <button id="open-login" class="btn btn--outline topbar__login">Log in</button>
-    <button id="logout-btn" class="btn btn--outline topbar__login" hidden>Log out</button>
+
+    <div id="profile-menu" class="profile-menu" hidden>
+      <button id="profile-trigger" class="profile-chip" aria-haspopup="true" aria-expanded="false" aria-controls="profile-dropdown">
+        <span id="profile-avatar" class="profile-avatar">--</span>
+      </button>
+
+      <div id="profile-dropdown" class="profile-dropdown" hidden>
+        <div class="profile-dropdown__wave" aria-hidden="true">
+          <svg viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10 V20 H0 Z"/></svg>
+        </div>
+        <div id="profile-avatar-lg" class="profile-dropdown__avatar">--</div>
+        <p id="profile-email" class="profile-dropdown__email">—</p>
+        <p id="profile-since" class="profile-dropdown__since">—</p>
+        <hr class="profile-dropdown__divider">
+        <button id="logout-btn" class="btn btn--outline profile-dropdown__logout">Log out</button>
+      </div>
+    </div>
   </nav>
 
   <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="topbar-nav">
@@ -37,7 +53,7 @@
 <div id="login-overlay" class="modal-overlay" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
     <button id="close-login" class="day-detail__close" aria-label="Close login form">×</button>
-    <span class="section__tag">Captain's access</span>
+    <span class="section__tag">Staff's access</span>
     <h3 id="login-title">Log in to the harbor office</h3>
     <p id="login-sub" class="modal-sub">Anyone can browse the tide board and ledger. Log in to add, edit, or remove a booking.</p>
 
@@ -67,7 +83,7 @@
     </form>
 
     <p class="modal-switch">
-      <span id="auth-switch-text">New to 99Yacht?</span>
+      <span id="auth-switch-text">New to yachtchartertz</span>
       <button type="button" id="auth-switch-btn" class="link-btn">Create an account</button>
     </p>
   </div>
@@ -80,30 +96,19 @@
     <div class="hero__text">
       <p class="hero__eyebrow">Est. dock at slip 99</p>
       <h1 class="hero__title">Every voyage<br> starts with a <span>line in the log.</span></h1>
-      <p class="hero__sub">Reserve your date, record the advance, and watch it take its place on the tide board — the harbor's shared view of what's already spoken for.</p>
+      <p class="hero__sub">Reserve the date, record the advance, and watch it take its place on the tide board — the harbor's shared view of what's already spoken for.</p>
       <a href="#book" class="btn btn--brass">Log a booking ↓</a>
     </div>
-    <div class="hero__glass" aria-hidden="true">
-      <svg viewBox="0 0 400 300" class="hero__yacht">
-        <defs>
-          <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#E4C878"/>
-            <stop offset="100%" stop-color="#B98D5E"/>
-          </linearGradient>
-        </defs>
-        <path d="M40 190 Q200 240 360 190 L330 220 Q200 260 70 220 Z" fill="url(#hull)"/>
-        <rect x="150" y="70" width="6" height="120" fill="#DCEEE9"/>
-        <path d="M156 78 L156 160 L235 160 Z" fill="#123C41" stroke="#DCEEE9" stroke-width="2"/>
-        <path d="M150 90 L150 155 L95 155 Z" fill="#DCEEE9" opacity="0.85"/>
-        <line x1="20" y1="222" x2="380" y2="222" stroke="#DCEEE9" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="2 10"/>
-      </svg>
+    <div class="hero__glass">
+      <!-- Drop your own yacht photo in this folder and update the filename below. -->
+      <img src="yacht.jpg" alt="99Yacht charter yacht" class="hero__yacht">
     </div>
   </section>
 
   <!-- BOOKING FORM -->
   <section id="book" class="section">
     <div class="section__head">
-      <span class="section__tag">01 — New entry</span>
+      <span class="section__tag">New entry</span>
       <h2>Write the client into the log</h2>
       <p>Every booking records the charter date, what's been paid down, and what's still owed at the dock.</p>
     </div>
@@ -111,17 +116,21 @@
     <form id="booking-form" class="log-card" autocomplete="off">
       <div class="log-card__row">
         <div class="field">
-          <label for="client-name">Client name</label>
+          <label for="client-name">Client's name</label>
           <input type="text" id="client-name" placeholder="e.g. Amara Kessi" required>
         </div>
         <div class="field">
           <label for="yacht-name">Yacht</label>
           <select id="yacht-name" required>
-            <option value="" disabled selected>Choose a vessel</option>
-            <option>The Meridian</option>
-            <option>Coral Drift</option>
-            <option>Salt & Sable</option>
-            <option>Windward Nine</option>
+            <option value="" disabled selected>Choose a verssel</option>
+            <option>Vip-cruise</option>
+            <option>Sunset</option>
+            <option>Miss-behaviour</option>
+            <option>Dinner-date</option>
+            <option>Valatea</option>
+            <option>Vip-boat-ride</option>
+            <option>Private-jet</option>
+            <option>Helicopter</option>
           </select>
         </div>
       </div>
@@ -152,9 +161,9 @@
   <!-- TIDE BOARD CALENDAR -->
   <section id="board" class="section section--dark">
     <div class="section__head">
-      <span class="section__tag section__tag--light">02 — Tide board</span>
+      <span class="section__tag section__tag--light">Calendar</span>
       <h2>See what's already claimed</h2>
-      <p>Every pennant marks a date that's spoken for. An empty square is still open water.</p>
+      <p>Every pennant marks a date that's booked. An empty square is still open.</p>
     </div>
 
     <div class="board">
@@ -179,7 +188,7 @@
   <!-- LEDGER -->
   <section id="ledger" class="section">
     <div class="section__head">
-      <span class="section__tag">03 — Ledger</span>
+      <span class="section__tag">Ledger</span>
       <h2>The full record</h2>
       <p>Every booking, what's been paid, and what's still owed at the dock.</p>
     </div>
@@ -208,7 +217,7 @@
 </main>
 
 <footer class="site-foot">
-  <span>99Yacht — a logbook, not a broker.</span>
+  <span>yachtchartertz logbook.</span>
   <span>Data stays on this device.</span>
 </footer>
 

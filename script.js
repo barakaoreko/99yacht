@@ -1,4 +1,4 @@
-// This file uses the `supabase` client created in supabaseClient.js,
+// This file uses the `window.sb` client created in supabaseClient.js,
 // which is loaded before this script in index.html.
 
 // ============ STATE ============
@@ -27,7 +27,7 @@ function rowToBooking(row) {
 }
 
 async function fetchBookings() {
-  const { data, error } = await supabase
+  const { data, error } = await window.sb
     .from("bookings")
     .select("*")
     .order("booking_date", { ascending: true });
@@ -40,7 +40,7 @@ async function fetchBookings() {
 }
 
 async function insertBooking(booking) {
-  const { data, error } = await supabase
+  const { data, error } = await window.sb
     .from("bookings")
     .insert({
       client_name: booking.client,
@@ -57,7 +57,7 @@ async function insertBooking(booking) {
 }
 
 async function deleteBookingRow(id) {
-  const { error } = await supabase.from("bookings").delete().eq("id", id);
+  const { error } = await window.sb.from("bookings").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -66,7 +66,7 @@ async function deleteBookingRow(id) {
 // Requires realtime replication turned on for the "bookings" table
 // (Supabase dashboard → Database → Replication).
 function subscribeRealtime() {
-  supabase
+  window.sb
     .channel("bookings-changes")
     .on(
       "postgres_changes",

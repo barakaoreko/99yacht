@@ -21,11 +21,24 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  background: var(--ink-navy);
+}
 
 body {
   margin: 0;
-  background: var(--ink-navy);
+  min-height: 100vh;
+  /* Drop your own background photo in this folder and update the filename
+     below. background-size: cover scales it to fill the whole page — width
+     and height — cropping only what's needed to avoid stretching or gaps.
+     The navy gradient on top keeps existing text readable over any photo —
+     adjust the 0.88 opacity if you want more or less of the photo to show
+     through. */
+  background:
+    linear-gradient(rgba(10, 31, 44, 0.88), rgba(10, 31, 44, 0.88)),
+    url("background.jpg") center / cover no-repeat fixed;
+  background-color: var(--ink-navy); /* shows if the image hasn't been added yet */
   color: var(--foam);
   font-family: var(--font-body);
   line-height: 1.5;
@@ -45,6 +58,10 @@ body {
 }
 
 a { color: inherit; }
+
+@media (max-width: 860px) {
+  body { background-attachment: scroll; }
+}
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
@@ -84,7 +101,6 @@ h1, h2, h3, h4 {
   gap: 0.5rem;
 }
 
-.topbar__anchor { color: var(--brass); }
 .topbar__word em { font-style: italic; color: var(--brass-light); font-weight: 500; }
 
 .topbar__nav { display: flex; align-items: center; gap: 2rem; }
@@ -110,6 +126,112 @@ h1, h2, h3, h4 {
 .topbar__login {
   padding: 0.5rem 1.2rem;
   font-size: 0.88rem;
+}
+
+/* ============ PROFILE BADGE ============ */
+.profile-menu { position: relative; }
+
+.profile-chip {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  background: linear-gradient(155deg, var(--deep-teal), var(--ink-navy));
+  border: 2px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.profile-chip:hover { transform: translateY(-1px); box-shadow: 0 0 0 5px rgba(200,155,60,0.16); }
+.profile-chip[aria-expanded="true"] { box-shadow: 0 0 0 5px rgba(200,155,60,0.28); }
+
+.profile-avatar {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--brass-light);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 1rem);
+  right: 0;
+  width: 240px;
+  background: var(--paper);
+  color: var(--ink-text);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.3rem 1.3rem;
+  box-shadow: 0 22px 48px rgba(0,0,0,0.42);
+  z-index: 60;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* little paper "tab" pointing up at the badge that opened it */
+.profile-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 16px;
+  width: 14px;
+  height: 14px;
+  background: var(--paper);
+  transform: rotate(45deg);
+}
+
+.profile-dropdown__wave {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 20px;
+  color: var(--deep-teal);
+  opacity: 0.12;
+}
+.profile-dropdown__wave svg { width: 100%; height: 100%; fill: currentColor; }
+
+.profile-dropdown__avatar {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  margin: 0.4rem auto 0.8rem;
+  background: linear-gradient(155deg, var(--brass-light), var(--brass));
+  color: var(--ink-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  border: 2px solid var(--rope-tan);
+}
+
+.profile-dropdown__email {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  margin: 0 0 0.25rem;
+  word-break: break-word;
+}
+
+.profile-dropdown__since {
+  font-size: 0.74rem;
+  color: var(--deep-teal);
+  opacity: 0.7;
+  margin: 0 0 1.1rem;
+  font-style: italic;
+}
+
+.profile-dropdown__divider {
+  border: none;
+  border-top: 1px dashed var(--paper-line);
+  margin: 0 0 1.1rem;
+}
+
+.profile-dropdown__logout {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Hamburger — hidden on desktop, shown on mobile */
@@ -209,6 +331,13 @@ h1, h2, h3, h4 {
   padding: 2rem;
 }
 .hero__yacht { width: 100%; height: auto; }
+
+img.hero__yacht {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
 
 /* ============ SECTIONS ============ */
 .section {
@@ -366,7 +495,7 @@ h1, h2, h3, h4 {
   padding: 0.65rem 0.75rem;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  border: 1px solid var(--paper-line);
+  border: 3px solid var(--paper-line);
   background: rgba(255,255,255,0.5);
   border-radius: 6px;
   color: var(--ink-text);
