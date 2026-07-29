@@ -60,7 +60,11 @@ body {
 a { color: inherit; }
 
 @media (max-width: 860px) {
-  body { background-attachment: scroll; }
+  body { 
+    background-attachment: scroll;
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat; }
 }
 
 h1, h2, h3, h4 {
@@ -101,8 +105,21 @@ h1, h2, h3, h4 {
   gap: 0.5rem;
 }
 
+.topbar__mark img{
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  display: block;
+}
+
 .topbar__anchor { color: var(--brass); }
 .topbar__word em { font-style: italic; color: var(--brass-light); font-weight: 500; }
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
 
 .topbar__nav { display: flex; align-items: center; gap: 2rem; }
 .topbar__nav a {
@@ -130,7 +147,8 @@ h1, h2, h3, h4 {
 }
 
 /* ============ PROFILE BADGE ============ */
-.profile-menu { position: relative; }
+.profile-menu { position: relative; display: flex; align-items: center; }
+.profile-menu[hidden] { display: none; }
 
 .profile-chip {
   width: 2.5rem;
@@ -753,6 +771,21 @@ img.hero__yacht {
     width: calc(100% - 2.8rem);
     text-align: center;
   }
+
+  /* The dropdown's normal position is calculated relative to the small
+     chip button, which sits close to the screen edge on narrow phones —
+     that math can push it partly off-screen. Anchoring it to the
+     viewport instead guarantees it's always fully visible. */
+  .profile-dropdown {
+    position: fixed;
+    top: 4.8rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    max-width: 320px;
+    margin: 0 0 0 auto;
+  }
+  .profile-dropdown::before { display: none; }
 }
 
 @media (min-width: 861px) {
