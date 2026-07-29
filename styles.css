@@ -322,7 +322,7 @@ h1, h2, h3, h4 {
 }
 
 .hero__glass {
-  background: radial-gradient(circle at 50% 40%, rgba(220,238,233,0.06), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(220,238,233,0.06), transparent 70%);
   border: 1px solid rgba(200, 155, 60, 0.25);
   border-radius: 50%;
   aspect-ratio: 1;
